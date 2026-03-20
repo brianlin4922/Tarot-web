@@ -1,0 +1,91 @@
+# Tarot-web
+<div id="draw-page">
+    <h2>請靜心思考你的問題，並選出三張牌</h2>
+    
+    <div class="deck-container">
+        <div class="deck" id="deck">
+            </div>
+    </div>
+
+    <div id="result-area" class="hidden">
+        <h3>你的抽牌結果</h3>
+        <div class="result-cards" id="result-cards"></div>
+        <button onclick="resetGame()">重新抽牌</button>
+    </div>
+</div>
+.deck-container {
+    overflow-x: auto; /* 允許左右滑動 */
+    padding: 50px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.deck {
+    display: flex;
+    gap: -20px; /* 讓牌稍微重疊，更有牌組感 */
+}
+
+.card-back {
+    width: 120px;
+    height: 200px;
+    background: #2c3e50; /* 牌背顏色或圖案 */
+    border: 3px solid #f1c40f;
+    border-radius: 10px;
+    transition: transform 0.3s ease; /* 平滑凸起動畫 */
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* 模擬滑到或選中的凸起感 */
+.card-back:hover {
+    transform: translateY(-30px) scale(1.05);
+    z-index: 10;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+const tarotDeck = [
+    { name: "愚者", meaning: "冒險、純真、新的開始" },
+    { name: "魔術師", meaning: "創造力、行動、潛力" },
+    // ... 之後可以擴充到 78 張
+];
+
+let selectedCount = 0;
+let results = [];
+
+function setupDeck() {
+    const deckElement = document.getElementById('deck');
+    for (let i = 0; i < 22; i++) { // 顯示22張大阿爾克那代表牌組
+        let card = document.createElement('div');
+        card.className = 'card-back';
+        card.onclick = () => selectCard(card);
+        deckElement.appendChild(card);
+    }
+}
+
+function selectCard(cardElement) {
+    if (selectedCount < 3) {
+        cardElement.style.visibility = 'hidden'; // 點擊後讓牌「消失」模擬被抽走
+        
+        // 隨機抽一張牌
+        let randomCard = tarotDeck[Math.floor(Math.random() * tarotDeck.length)];
+        results.push(randomCard);
+        selectedCount++;
+
+        if (selectedCount === 3) {
+            showResults();
+        }
+    }
+}
+
+function showResults() {
+    document.getElementById('deck').classList.add('hidden');
+    const resultArea = document.getElementById('result-area');
+    const cardsDiv = document.getElementById('result-cards');
+    
+    resultArea.classList.remove('hidden');
+    cardsDiv.innerHTML = results.map(card => `
+        <div class="card-item">
+            <h4>${card.name}</h4>
+            <p>${card.meaning}</p>
+        </div>
+    `).join('');
+}
